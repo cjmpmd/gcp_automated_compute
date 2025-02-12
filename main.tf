@@ -9,12 +9,12 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_firewall" "default" {
-  name    = "allow-ssh"
+  name    = "allow-http-https-ssh"
   network = google_compute_network.vpc_network.name
 
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports    = ["22", "80", "443"]
   }
 
   source_ranges = ["0.0.0.0/0"]  # Open to all, restrict in production
@@ -33,10 +33,18 @@ resource "google_compute_instance" "vm_instance" {
 
   network_interface {
     network = google_compute_network.vpc_network.name
-    access_config {}
+    access_config {}  # Assigns a public IP
   }
 
-  tags = ["ssh"]
+  metadata_startup_script = <<-EOF
+    #!/bin/bash
+    sudo apt update -y
+    sudo apt install -y nginx
+    sudo systemctl start nginx
+    sudo systemctl enable nginx
+  EOF
+
+  tags = ["ssh", "http", "https"]
 }
 
 output "instance_ip" {
