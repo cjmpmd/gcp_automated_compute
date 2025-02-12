@@ -4,9 +4,9 @@ provider "google" {
   region      = "us-central1"
 }
 
-resource "google_compute_network" "vpc_network" {
-  name = "terraform-network"
-}
+# resource "google_compute_network" "vpc_network" {
+#   name = "terraform-network"
+# }
 
 resource "google_compute_firewall" "default" {
   name    = "allow-http-https-ssh"
